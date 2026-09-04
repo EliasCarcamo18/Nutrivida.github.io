@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Reserva de Citas - NutriVida</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <header>
+        <h1>NutriVida</h1>
+        <nav>
+            <a href="index.html">Inicio</a>
+            <a href="productos.html">Servicios</a>
+        </nav>
+    </header>
+
+    <main>
+        <h2>Confirmacion de Agendamiento</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Servicio Seleccionado</th>
+                    <th>Valor</th>
+                    <th>Accion</th>
+                </tr>
+            </thead>
+            <tbody id="tabla-carrito"></tbody>
+        </table>
+
+        <div style="margin-top: 20px; text-align: right;">
+            <h3>Total a Pagar: <span id="total-reserva">$0</span></h3>
+            <button class="btn" onclick="confirmarReserva()">Confirmar Cita</button>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2026 NutriVida</p>
+    </footer>
+    <script src="js/carrito.js"></script>
+</body>
+</html>
