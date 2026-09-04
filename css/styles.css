@@ -158,11 +158,13 @@ th {
     color: #2e7d32;
 }
 
-/* Footer */
+
 footer {
     background-color: #1b5e20;
     color: white;
     text-align: center;
     padding: 15px;
     margin-top: 30px;
+    font-size: 14px;
+    line-height: 1.6;
 }
