@@ -29,3 +29,4 @@ function agregarAlCarrito(id) {
     localStorage.setItem("carrito", JSON.stringify(carrito));
     alert("Servicio agregado a la reserva de agendamiento.");
 }
+
