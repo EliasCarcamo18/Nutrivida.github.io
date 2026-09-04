@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Registro Pacientes - NutriVida</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <header>
+        <h1>NutriVida</h1>
+        <nav><a href="index.html">Inicio</a></nav>
+    </header>
+
+    <main>
+        <form id="form-registro" class="formulario">
+            <h2>Registro de Nuevo Paciente</h2>
+            
+            <div class="grupo-form">
+                <label>Nombre Completo:</label>
+                <input type="text" id="nombre">
+                <span id="error-nombre" class="error-msg"></span>
+            </div>
+
+            <div class="grupo-form">
+                <label>RUT:</label>
+                <input type="text" id="rut" placeholder="12345678-9">
+                <span id="error-rut" class="error-msg"></span>
+            </div>
+
+            <div class="grupo-form">
+                <label>Correo Electronico:</label>
+                <input type="email" id="email">
+                <span id="error-email" class="error-msg"></span>
+            </div>
+
+            <div class="grupo-form">
+                <label>Region:</label>
+                <select id="region">
+                    <option value="">Seleccione Region</option>
+                </select>
+            </div>
+
+            <div class="grupo-form">
+                <label>Comuna:</label>
+                <select id="comuna">
+                    <option value="">Seleccione Comuna</option>
+                </select>
+            </div>
+
+            <button type="submit" class="btn">Registrarse</button>
+        </form>
+    </main>
+
+    <footer>
+        <p>&copy; 2026 NutriVida</p>
+    </footer>
+    <script src="js/validaciones.js"></script>
+    <script src="js/regiones.js"></script>
+</body>
+</html>
