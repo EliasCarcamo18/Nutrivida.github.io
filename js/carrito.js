@@ -45,3 +45,4 @@ function confirmarReserva() {
     localStorage.removeItem("carrito");
     renderizarCarrito();
 }
+
