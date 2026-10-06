@@ -2,20 +2,36 @@ import { useState } from 'react';
 
 export const Contacto = () => {
   const [formData, setFormData] = useState({ nombre: '', email: '', mensaje: '' });
-  const [errorEmail, setErrorEmail] = useState('');
+  const [errores, setErrores] = useState({});
   const [enviado, setEnviado] = useState(false);
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    
-    // Validacion de correo en espanol
+    const nuevosErrores = {};
+
+    if (!formData.nombre.trim()) {
+      nuevosErrores.nombre = 'Por favor, ingresa tu nombre completo.';
+    }
+
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(formData.email)) {
-      setErrorEmail('Por favor, ingresa un correo valido. Ejemplo: paciente@ejemplo.com');
+    if (!formData.email) {
+      nuevosErrores.email = 'Por favor, ingresa tu correo electrónico.';
+    } else if (!emailRegex.test(formData.email)) {
+      nuevosErrores.email = 'Escribe un correo válido. Ejemplo: paciente@ejemplo.com';
+    }
+
+    // Exigir mensaje obligatorio
+    if (!formData.mensaje.trim()) {
+      nuevosErrores.mensaje = 'El campo de mensaje es obligatorio. Por favor, escribe tu consulta antes de enviar.';
+    }
+
+    if (Object.keys(nuevosErrores).length > 0) {
+      setErrores(nuevosErrores);
+      setEnviado(false);
       return;
     }
 
-    setErrorEmail('');
+    setErrores({});
     setEnviado(true);
     setFormData({ nombre: '', email: '', mensaje: '' });
   };
@@ -25,54 +41,51 @@ export const Contacto = () => {
       <h2 className="text-success mb-4">Contacto y Ubicación</h2>
 
       <div className="row g-4">
-        {/* Formulario de Contacto */}
         <div className="col-12 col-md-6">
           <div className="p-4 border rounded bg-light">
             <h4>Envíanos un mensaje</h4>
+            
             {enviado && (
-              <div className="alert alert-success" role="alert">
+              <div className="alert alert-success mt-2" role="alert">
                 ¡Gracias por contactarnos! Te responderemos a la brevedad.
               </div>
             )}
+
             <form onSubmit={handleSubmit} noValidate>
               <div className="mb-3">
                 <label className="form-label">Nombre Completo</label>
                 <input
                   type="text"
-                  className="form-control"
+                  className={`form-control ${errores.nombre ? 'is-invalid' : ''}`}
                   placeholder="Ej: María González"
                   value={formData.nombre}
                   onChange={(e) => setFormData({ ...formData, nombre: e.target.value })}
-                  required
                 />
+                {errores.nombre && <div className="invalid-feedback d-block">{errores.nombre}</div>}
               </div>
 
               <div className="mb-3">
                 <label className="form-label">Correo Electrónico</label>
                 <input
                   type="email"
-                  className={`form-control ${errorEmail ? 'is-invalid' : ''}`}
+                  className={`form-control ${errores.email ? 'is-invalid' : ''}`}
                   placeholder="Ejemplo: paciente@ejemplo.com"
                   value={formData.email}
-                  onChange={(e) => {
-                    setFormData({ ...formData, email: e.target.value });
-                    if (errorEmail) setErrorEmail('');
-                  }}
-                  required
+                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                 />
-                {errorEmail && <div className="invalid-feedback">{errorEmail}</div>}
+                {errores.email && <div className="invalid-feedback d-block">{errores.email}</div>}
               </div>
 
               <div className="mb-3">
-                <label className="form-label">Mensaje</label>
+                <label className="form-label">Mensaje <span className="text-danger">*</span></label>
                 <textarea
-                  className="form-rows-3 form-control"
+                  className={`form-control ${errores.mensaje ? 'is-invalid' : ''}`}
                   rows="4"
                   placeholder="Escribe tu consulta o requerimiento aquí..."
                   value={formData.mensaje}
                   onChange={(e) => setFormData({ ...formData, mensaje: e.target.value })}
-                  required
                 ></textarea>
+                {errores.mensaje && <div className="invalid-feedback d-block">{errores.mensaje}</div>}
               </div>
 
               <button type="submit" className="btn btn-success w-100">
@@ -82,7 +95,6 @@ export const Contacto = () => {
           </div>
         </div>
 
-        {/* Mapa y datos de la clínica en Temuco */}
         <div className="col-12 col-md-6">
           <div className="p-4 border rounded bg-light h-100 d-flex flex-column">
             <h4>Nuestra Ubicación en Temuco</h4>
