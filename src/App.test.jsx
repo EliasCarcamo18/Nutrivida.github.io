@@ -1,15 +1,18 @@
 import { render, screen } from '@testing-library/react';
+import { describe, test, expect } from 'vitest';
 import { HashRouter } from 'react-router';
-import { describe, it, expect } from 'vitest';
 import App from './App';
 
 describe('App Root Component', () => {
-  it('renders NutriVida brand header correctly', () => {
+  test('renders NutriVida brand header correctly', () => {
     render(
       <HashRouter>
         <App />
       </HashRouter>
     );
-    expect(screen.getByText(/NutriVida/i)).toBeInTheDocument();
+
+    // Buscar específicamente el enlace del Navbar con el texto NutriVida
+    const brandLink = screen.getByRole('link', { name: /^NutriVida$/i });
+    expect(brandLink).toBeInTheDocument();
   });
 });
