@@ -1,155 +1,102 @@
-/* Estilos globales y reglas responsivas */
-
-:root {
-  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
+/* Estilos del Header / Navbar */
+.navbar-site {
+  background-color: #198754;
+  padding: 0.75rem 1rem;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
 }
 
-/* Evitar scroll horizontal accidental */
-body {
-  margin: 0;
-  min-width: 320px;
-  min-height: 100vh;
-  overflow-x: hidden;
-}
-
-/* Imagenes adaptables en todo el sitio */
-img {
-  max-width: 100%;
-  height: auto;
-}
-
-/* Ajustes tipograficos para pantallas moviles */
-@media (max-width: 576px) {
-  h1 {
-    font-size: 1.75rem;
-  }
-  h2 {
-    font-size: 1.5rem;
-  }
-  .container {
-    padding-left: 1rem;
-    padding-right: 1rem;
-  }
-}
-
-/* Estructura general de la app (Layout) */
-.layout-wrapper {
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
-}
-
-.layout-content {
-  flex-grow: 1;
-}
-
-/* Estilos del Pie de Página (Footer) */
-.footer-site {
-  background-color: #212529;
-  color: #ffffff;
-  padding-top: 3rem;
-  padding-bottom: 2rem;
-  margin-top: auto;
-}
-
-.footer-container {
-  width: 100%;
+.navbar-container {
   max-width: 1200px;
   margin: 0 auto;
-  padding-left: 1rem;
-  padding-right: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
 }
 
-.footer-grid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 2rem;
-  text-align: center;
-}
-
-/* Responsividad: 3 columnas a partir de tablets y computadoras */
-@media (min-width: 768px) {
-  .footer-grid {
-    grid-template-columns: repeat(3, 1fr);
-    text-align: left;
-  }
-}
-
-.footer-brand {
-  color: #198754;
-  font-size: 1.25rem;
+.navbar-brand {
+  color: #ffffff;
+  font-size: 1.5rem;
   font-weight: bold;
-  text-transform: uppercase;
-  margin-bottom: 1rem;
+  text-decoration: none;
 }
 
-.footer-title {
-  color: #f8f9fa;
-  font-size: 1.1rem;
-  font-weight: bold;
-  text-transform: uppercase;
-  margin-bottom: 1rem;
+.navbar-toggle {
+  display: block;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  color: #ffffff;
+  font-size: 1.4rem;
+  padding: 0.2rem 0.6rem;
+  border-radius: 4px;
+  cursor: pointer;
 }
 
-.footer-text {
-  color: #adb5bd;
-  line-height: 1.6;
-  margin-bottom: 0;
+.navbar-menu {
+  display: none;
+  width: 100%;
+  margin-top: 0.75rem;
 }
 
-.footer-list {
+/* Muestra el menú en celulares al hacer clic */
+.navbar-menu.is-open {
+  display: block;
+}
+
+.navbar-nav {
   list-style: none;
   padding: 0;
   margin: 0;
-}
-
-.footer-list li {
-  margin-bottom: 0.5rem;
-}
-
-.footer-link {
-  color: #adb5bd;
-  text-decoration: none;
-  transition: color 0.2s ease-in-out;
-}
-
-.footer-link:hover {
-  color: #ffffff;
-}
-
-.footer-contact-item {
-  color: #ffffff;
-  margin-bottom: 0.5rem;
   display: flex;
-  align-items: center;
-  justify-content: center;
+  flex-direction: column;
+  gap: 0.5rem;
 }
 
-@media (min-width: 768px) {
-  .footer-contact-item {
-    justify-content: flex-start;
-  }
+.nav-link {
+  color: rgba(255, 255, 255, 0.9);
+  text-decoration: none;
+  font-weight: 500;
+  padding: 0.5rem 0;
+  display: block;
+  transition: color 0.2s ease;
 }
 
-.footer-icon {
-  margin-right: 0.5rem;
+.nav-link:hover {
+  color: #ffffff;
 }
 
-.footer-divider {
-  border: 0;
-  border-top: 1px solid #495057;
-  margin-top: 2rem;
-  margin-bottom: 1.5rem;
-}
-
-.footer-bottom {
+.nav-link-btn {
+  background-color: rgba(255, 255, 255, 0.2);
+  padding: 0.4rem 0.8rem;
+  border-radius: 4px;
   text-align: center;
 }
 
-.footer-copyright {
-  color: #adb5bd;
-  font-size: 0.875rem;
-  margin: 0;
+.nav-link-btn:hover {
+  background-color: rgba(255, 255, 255, 0.3);
+}
+
+/* Pantallas de escritorio / laptop */
+@media (min-width: 768px) {
+  .navbar-toggle {
+    display: none;
+  }
+
+  .navbar-menu {
+    display: flex !important;
+    width: auto;
+    margin-top: 0;
+  }
+
+  .navbar-nav {
+    flex-direction: row;
+    align-items: center;
+    gap: 1.5rem;
+  }
+
+  .nav-link {
+    padding: 0;
+  }
 }
