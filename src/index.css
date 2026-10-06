@@ -1,33 +1,35 @@
+/* Estilos globales y reglas responsivas */
+
 :root {
-  --primary-green: #198754;
-  --secondary-green: #146c43;
-  --bg-light-gray: #f8f9fa;
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
 }
 
+/* Evitar scroll horizontal accidental */
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  background-color: var(--bg-light-gray);
-  color: #212529;
+  min-width: 320px;
+  min-height: 100vh;
+  overflow-x: hidden;
 }
 
-/* Transiciones suaves para botones y tarjetas */
-.card {
-  transition: transform 0.2s ease-in-out, shadow 0.2s ease-in-out;
+/* Imagenes adaptables en todo el sitio */
+img {
+  max-width: 100%;
+  height: auto;
 }
 
-.card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
-}
-
-/* Tabla responsive para vista Admin */
-.table-responsive {
-  border-radius: 0.5rem;
-  overflow: hidden;
-  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+/* Ajustes tipograficos para pantallas moviles */
+@media (max-width: 576px) {
+  h1 {
+    font-size: 1.75rem;
+  }
+  h2 {
+    font-size: 1.5rem;
+  }
+  .container {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
 }
