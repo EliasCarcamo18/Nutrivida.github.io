@@ -1,21 +1,19 @@
 import { Navigate, Outlet } from 'react-router';
-import PropTypes from 'prop-types';
 
 export const ProtectedRoute = ({ allowedRoles }) => {
-  const token = localStorage.getItem('token');
-  const userRole = localStorage.getItem('rol');
+  // Leemos la sesion desde localStorage
+  const userJson = localStorage.getItem('nutrivida_user');
+  const user = userJson ? JSON.parse(userJson) : null;
 
-  if (!token) {
+  if (!user) {
+    // Si no ha iniciado sesion, redirige a /login sin pantalla en blanco
     return <Navigate to="/login" replace />;
   }
 
-  if (allowedRoles && !allowedRoles.includes(userRole)) {
+  if (allowedRoles && !allowedRoles.includes(user.role)) {
+    // Si no tiene el rol necesario (ej. Paciente intentando entrar a Admin), vuelve a inicio
     return <Navigate to="/" replace />;
   }
 
   return <Outlet />;
-};
-
-ProtectedRoute.propTypes = {
-  allowedRoles: PropTypes.arrayOf(PropTypes.string),
 };
