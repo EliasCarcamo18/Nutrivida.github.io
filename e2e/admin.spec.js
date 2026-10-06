@@ -7,13 +7,11 @@ test.describe('Módulo de Administración', () => {
   });
 
   test('debe cargar la lista de usuarios para el rol ADMINISTRADOR', async ({ page }) => {
-    // Interceptar la petición de autenticación / perfil
     await page.addInitScript(() => {
       localStorage.setItem('token', 'fake-jwt-admin-token');
       localStorage.setItem('rol', 'ADMINISTRADOR');
     });
 
-    // Mockear la API de usuarios
     await page.route('**/api/v1/usuarios', route => route.fulfill({
       status: 200,
       contentType: 'application/json',
