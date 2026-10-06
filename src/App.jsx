@@ -5,7 +5,7 @@ import { ProtectedRoute } from './components/ProtectedRoute';
 import { Home } from './pages/Home';
 import { Servicios } from './pages/Servicios';
 import { ServiciosDetail } from './pages/ServiciosDetail';
-import { Nosostros } from './pages/Nosotros';
+import { Nosotros } from './pages/Nosotros'; // ← Corregido (sin la "s" extra)
 import { Contacto } from './pages/Contacto';
 import { Blog } from './pages/Blog';
 import { Login } from './pages/Login';
@@ -22,7 +22,7 @@ export function App() {
         <Route index element={<Home />} />
         <Route path="servicios" element={<Servicios />} />
         <Route path="servicios/:id" element={<ServiciosDetail />} />
-        <Route path="nosotros" element={<Nosostros />} />
+        <Route path="nosotros" element={<Nosotros />} /> {/* ← Corregido */}
         <Route path="contacto" element={<Contacto />} />
         <Route path="blog" element={<Blog />} />
         <Route path="login" element={<Login />} />
