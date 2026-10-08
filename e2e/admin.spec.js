@@ -8,17 +8,13 @@ test.describe('Módulo de Administración', () => {
 
   test('debe cargar la lista de usuarios para el rol ADMINISTRADOR', async ({ page }) => {
     await page.addInitScript(() => {
-      localStorage.setItem('token', 'fake-jwt-admin-token');
-      localStorage.setItem('rol', 'ADMINISTRADOR');
+      localStorage.setItem('nutrivida_user', JSON.stringify({
+        id: 1,
+        nombre: 'Admin NutriVida',
+        email: 'admin@nutrivida.cl',
+        role: 'ADMINISTRADOR'
+      }));
     });
-
-    await page.route('**/api/v1/usuarios', route => route.fulfill({
-      status: 200,
-      contentType: 'application/json',
-      body: JSON.stringify([
-        { id: 1, nombre: 'Admin NutriVida', email: 'admin@nutrivida.cl', rol: 'ADMINISTRADOR', activo: true }
-      ])
-    }));
 
     await page.goto('/#/admin');
     await expect(page.locator('h2')).toContainText('Panel de Administración');

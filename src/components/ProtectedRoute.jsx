@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import { Navigate, Outlet } from 'react-router';
 
 export const ProtectedRoute = ({ allowedRoles }) => {
@@ -16,4 +17,8 @@ export const ProtectedRoute = ({ allowedRoles }) => {
   }
 
   return <Outlet />;
+};
+
+ProtectedRoute.propTypes = {
+  allowedRoles: PropTypes.arrayOf(PropTypes.string),
 };
