@@ -4,7 +4,6 @@ on:
   push:
     branches: ["main"]
 
-# Permisos requeridos para desplegar en GitHub Pages
 permissions:
   contents: read
   pages: write
@@ -15,7 +14,8 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  build-and-deploy:
+  # 1. Compilación del proyecto y subida del artefacto
+  build:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repo
@@ -33,13 +33,19 @@ jobs:
       - name: Build project
         run: npm run build
 
-      # 1. Subir los archivos generados como artefacto de Pages
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: './dist' # O './build' según la carpeta que genere tu proyecto
+          path: './dist' # Verifica si Vite genera 'dist' o 'build'
 
-      # 2. Desplegar el artefacto directamente en GitHub Pages
+  # 2. Publicación oficial en el entorno de GitHub Pages
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
