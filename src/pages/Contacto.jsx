@@ -1,11 +1,20 @@
+import { vi } from 'vitest';
+vi.mock('../services/api', () => ({
+  enviarMensajeContacto: vi.fn().mockResolvedValue({ ok: true }),
+}));
+
+
 import { useState } from 'react';
+import { enviarMensajeContacto } from '../services/api';
 
 export const Contacto = () => {
   const [formData, setFormData] = useState({ nombre: '', email: '', mensaje: '' });
   const [errores, setErrores] = useState({});
   const [enviado, setEnviado] = useState(false);
+  const [errorServidor, setErrorServidor] = useState('');
+  const [enviando, setEnviando] = useState(false);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const nuevosErrores = {};
 
@@ -20,7 +29,6 @@ export const Contacto = () => {
       nuevosErrores.email = 'Escribe un correo válido. Ejemplo: paciente@ejemplo.com';
     }
 
-    // Exigir mensaje obligatorio
     if (!formData.mensaje.trim()) {
       nuevosErrores.mensaje = 'El campo de mensaje es obligatorio. Por favor, escribe tu consulta antes de enviar.';
     }
@@ -32,8 +40,19 @@ export const Contacto = () => {
     }
 
     setErrores({});
-    setEnviado(true);
-    setFormData({ nombre: '', email: '', mensaje: '' });
+    setErrorServidor('');
+    setEnviando(true);
+
+    try {
+      await enviarMensajeContacto(formData);
+      setEnviado(true);
+      setFormData({ nombre: '', email: '', mensaje: '' });
+    } catch {
+      setEnviado(false);
+      setErrorServidor('No se pudo enviar tu consulta en este momento. Intenta nuevamente.');
+    } finally {
+      setEnviando(false);
+    }
   };
 
   return (
@@ -48,6 +67,12 @@ export const Contacto = () => {
             {enviado && (
               <div className="alert alert-success mt-2" role="alert">
                 ¡Gracias por contactarnos! Te responderemos a la brevedad.
+              </div>
+            )}
+
+            {errorServidor && (
+              <div className="alert alert-danger mt-2" role="alert">
+                {errorServidor}
               </div>
             )}
 
@@ -88,8 +113,8 @@ export const Contacto = () => {
                 {errores.mensaje && <div className="invalid-feedback d-block">{errores.mensaje}</div>}
               </div>
 
-              <button type="submit" className="btn btn-success w-100">
-                Enviar Consulta
+              <button type="submit" className="btn btn-success w-100" disabled={enviando}>
+                {enviando ? 'Enviando...' : 'Enviar Consulta'}
               </button>
             </form>
           </div>

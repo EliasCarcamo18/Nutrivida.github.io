@@ -1,7 +1,7 @@
-import { useState } from 'react';
+﻿import { useState } from 'react';
+import { crearCita } from '../services/api';
 
 export const Reserva = () => {
-  // Lista de especialistas con sus horarios y días disponibles
   const especialistas = [
     {
       id: 'carolina',
@@ -26,11 +26,12 @@ export const Reserva = () => {
   const [motivo, setMotivo] = useState('');
   const [errores, setErrores] = useState({});
   const [exito, setExito] = useState(false);
+  const [errorServidor, setErrorServidor] = useState('');
+  const [enviando, setEnviando] = useState(false);
 
-  // Obtiene los horarios disponibles según el especialista activo
   const nutricionistaActual = especialistas.find(e => e.id === especialistaSeleccionado);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const nuevosErrores = {};
 
@@ -53,10 +54,26 @@ export const Reserva = () => {
     }
 
     setErrores({});
-    setExito(true);
-    setMotivo('');
-    setFecha('');
-    setHora('');
+    setErrorServidor('');
+    setEnviando(true);
+
+    try {
+      await crearCita({
+        especialista: nutricionistaActual.nombre,
+        fecha,
+        hora,
+        motivo: motivo.trim(),
+      });
+      setExito(true);
+      setMotivo('');
+      setFecha('');
+      setHora('');
+    } catch {
+      setExito(false);
+      setErrorServidor('No se pudo conectar con el servidor para agendar la cita. Intenta nuevamente.');
+    } finally {
+      setEnviando(false);
+    }
   };
 
   return (
@@ -69,9 +86,14 @@ export const Reserva = () => {
         </div>
       )}
 
+      {errorServidor && (
+        <div className="alert alert-danger" role="alert">
+          {errorServidor}
+        </div>
+      )}
+
       <div className="card p-4 shadow-sm">
         <form onSubmit={handleSubmit} noValidate>
-          {/* Seleccionar Nutricionista */}
           <div className="mb-3">
             <label className="form-label font-weight-bold">Seleccionar Nutricionista</label>
             <select
@@ -79,7 +101,7 @@ export const Reserva = () => {
               value={especialistaSeleccionado}
               onChange={(e) => {
                 setEspecialistaSeleccionado(e.target.value);
-                setHora(''); // Reiniciar hora al cambiar especialista
+                setHora('');
               }}
             >
               {especialistas.map((esp) => (
@@ -90,7 +112,6 @@ export const Reserva = () => {
             </select>
           </div>
 
-          {/* Fecha */}
           <div className="mb-3">
             <label className="form-label font-weight-bold">Fecha de Atención</label>
             <input
@@ -102,7 +123,6 @@ export const Reserva = () => {
             {errores.fecha && <div className="invalid-feedback d-block">{errores.fecha}</div>}
           </div>
 
-          {/* Horarios disponibles según el especialista */}
           <div className="mb-3">
             <label className="form-label font-weight-bold">Horarios Disponibles para este Especialista</label>
             <select
@@ -120,7 +140,6 @@ export const Reserva = () => {
             {errores.hora && <div className="invalid-feedback d-block">{errores.hora}</div>}
           </div>
 
-          {/* Motivo de la Consulta */}
           <div className="mb-3">
             <label className="form-label font-weight-bold">Motivo de la Consulta <span className="text-danger">*</span></label>
             <textarea
@@ -133,8 +152,8 @@ export const Reserva = () => {
             {errores.motivo && <div className="invalid-feedback d-block">{errores.motivo}</div>}
           </div>
 
-          <button type="submit" className="btn btn-success w-100">
-            Confirmar y Agendar Cita
+          <button type="submit" className="btn btn-success w-100" disabled={enviando}>
+            {enviando ? 'Agendando...' : 'Confirmar y Agendar Cita'}
           </button>
         </form>
       </div>

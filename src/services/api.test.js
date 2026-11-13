@@ -62,4 +62,15 @@ describe('Servicio API REST (api.js)', () => {
     );
     expect(resultado).toEqual({ status: 'OK' });
   });
+  it('crearCita debe lanzar un error si el servidor falla', async () => {
+    global.fetch = vi.fn().mockResolvedValue({ ok: false });
+
+    await expect(crearCita({ nombre: 'Test' })).rejects.toThrow('Error al registrar la cita');
+  });
+
+  it('enviarMensajeContacto debe lanzar un error si el servidor falla', async () => {
+    global.fetch = vi.fn().mockResolvedValue({ ok: false });
+
+    await expect(enviarMensajeContacto({ nombre: 'Test' })).rejects.toThrow('Error al enviar el mensaje de contacto');
+  });
 });
