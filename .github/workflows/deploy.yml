@@ -14,7 +14,6 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  # 1. Compilación del proyecto y subida del artefacto
   build:
     runs-on: ubuntu-latest
     steps:
@@ -36,9 +35,8 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: './dist' # Verifica si Vite genera 'dist' o 'build'
+          path: './dist' 
 
-  # 2. Publicación oficial en el entorno de GitHub Pages
   deploy:
     environment:
       name: github-pages
