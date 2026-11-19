@@ -38,7 +38,7 @@ export const Navbar = () => {
             <li><Link className="nav-link" onClick={closeMenu} to="/">Inicio</Link></li>
             <li><Link className="nav-link" onClick={closeMenu} to="/servicios">Servicios</Link></li>
             <li><Link className="nav-link" onClick={closeMenu} to="/nosotros">Nosotros</Link></li>
-            <li><Link className="nav-link" onClick={closeMenu} to="/contacto">Contacto</Link></li>
+            <li><Link className="nav-link" onClick={closeMenu} to="/api/v1/contacto">Contacto</Link></li>
             <li><Link className="nav-link" onClick={closeMenu} to="/blog">Blog</Link></li>
 
             {user && (

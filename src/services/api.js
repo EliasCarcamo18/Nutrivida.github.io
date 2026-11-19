@@ -1,4 +1,8 @@
-const API_URL = import.meta.env.VITE_API_BASE_URL || '/api/v1';
+const API_URL = (() => {
+  const raw = ((import.meta.env.VITE_API_BASE_URL || '/api/v1').trim().replace(/\/+$/, '').replace(/\/api$/, '/api/v1'));
+  if (!raw) return '/api/v1';
+  return raw.endsWith('/v1') ? raw : `${raw}/v1`;
+})();
 
 export function getAuthHeaders() {
   const userJson = localStorage.getItem('nutrivida_user');
@@ -9,7 +13,7 @@ export function getAuthHeaders() {
 }
 
 export async function loginUsuario(email, password) {
-  const response = await fetch(`/auth/login`, {
+  const response = await fetch(`/api/v1/auth/login`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ email, password }),
@@ -22,7 +26,7 @@ export async function loginUsuario(email, password) {
 }
 
 export async function registrarUsuario(nombre, email, password) {
-  const response = await fetch(`/auth/register`, {
+  const response = await fetch(`/api/v1/auth/register`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ nombre, email, password }),
@@ -36,7 +40,7 @@ export async function registrarUsuario(nombre, email, password) {
 
 export async function obtenerHorasOcupadas(servicio, fecha) {
   const params = new URLSearchParams({ servicio, fecha });
-  const response = await fetch(`/citas/ocupadas?${params.toString()}`);
+  const response = await fetch(`/api/v1/citas/ocupadas?${params.toString()}`);
   if (!response.ok) {
     const errorBody = await response.json().catch(() => ({}));
     throw new Error(errorBody.mensaje || 'No hay conexión con el servidor o la base de datos.');
@@ -45,7 +49,7 @@ export async function obtenerHorasOcupadas(servicio, fecha) {
 }
 
 export async function crearCita(citaData) {
-  const response = await fetch(`/citas`, {
+  const response = await fetch(`/api/v1/citas`, {
     method: 'POST',
     headers: getAuthHeaders(),
     body: JSON.stringify(citaData),
@@ -58,7 +62,7 @@ export async function crearCita(citaData) {
 }
 
 export async function enviarMensajeContacto(contactoData) {
-  const response = await fetch(`/contacto`, {
+  const response = await fetch(`/api/v1/contacto`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(contactoData),

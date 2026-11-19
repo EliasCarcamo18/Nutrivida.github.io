@@ -14,7 +14,7 @@ describe('Servicio API REST (api.js)', () => {
     });
 
     const resultado = await obtenerCitas();
-    expect(fetch).toHaveBeenCalledWith(expect.stringContaining('/citas'));
+    expect(fetch).toHaveBeenCalledWith(expect.stringContaining('/api/v1/citas'));
     expect(resultado).toEqual(mockCitas);
   });
 
@@ -35,7 +35,7 @@ describe('Servicio API REST (api.js)', () => {
 
     const resultado = await crearCita(nuevaCita);
     expect(fetch).toHaveBeenCalledWith(
-      expect.stringContaining('/citas'),
+      expect.stringContaining('/api/v1/citas'),
       expect.objectContaining({
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -54,7 +54,7 @@ describe('Servicio API REST (api.js)', () => {
 
     const resultado = await enviarMensajeContacto(mensaje);
     expect(fetch).toHaveBeenCalledWith(
-      expect.stringContaining('/contacto'),
+      expect.stringContaining('/api/v1/contacto'),
       expect.objectContaining({
         method: 'POST',
         body: JSON.stringify(mensaje),
