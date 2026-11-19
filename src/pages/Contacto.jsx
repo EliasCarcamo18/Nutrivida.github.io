@@ -1,9 +1,3 @@
-import { vi } from 'vitest';
-vi.mock('../services/api', () => ({
-  enviarMensajeContacto: vi.fn().mockResolvedValue({ ok: true }),
-}));
-
-
 import { useState } from 'react';
 import { enviarMensajeContacto } from '../services/api';
 

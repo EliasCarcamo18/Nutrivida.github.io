@@ -1,12 +1,15 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router';
+import { registrarUsuario } from '../services/api';
 
 export const Registro = () => {
   const [formData, setFormData] = useState({ nombre: '', email: '', password: '' });
   const [errores, setErrores] = useState({});
+  const [errorServidor, setErrorServidor] = useState('');
+  const [cargando, setCargando] = useState(false);
   const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const nuevosErrores = {};
 
@@ -33,19 +36,25 @@ export const Registro = () => {
     }
 
     setErrores({});
-    const sessionData = {
-      email: formData.email,
-      nombre: formData.nombre,
-      role: 'PACIENTE'
-    };
-    localStorage.setItem('nutrivida_user', JSON.stringify(sessionData));
-    navigate('/reserva');
+    setErrorServidor('');
+    setCargando(true);
+    try {
+      const authData = await registrarUsuario(formData.nombre, formData.email, formData.password);
+      localStorage.setItem('nutrivida_user', JSON.stringify(authData));
+      navigate('/reserva');
+    } catch (err) {
+      setErrorServidor(err.message);
+    } finally {
+      setCargando(false);
+    }
   };
 
   return (
     <div className="container py-5 d-flex justify-content-center">
       <div className="card p-4 shadow-sm" style={{ maxWidth: '420px', width: '100%' }}>
         <h3 className="text-center text-success mb-3">Registro de Paciente</h3>
+
+        {errorServidor && <div className="alert alert-danger py-2 small">{errorServidor}</div>}
 
         <form onSubmit={handleSubmit} noValidate>
           <div className="mb-3">
@@ -84,14 +93,14 @@ export const Registro = () => {
             {errores.password && <div className="invalid-feedback d-block">{errores.password}</div>}
           </div>
 
-          <button type="submit" className="btn btn-success w-100 mb-3">
-            Crear Cuenta
+          <button type="submit" className="btn btn-success w-100 mb-3" disabled={cargando}>
+            {cargando ? 'Registrando...' : 'Crear Cuenta'}
           </button>
         </form>
 
         <div className="text-center mt-2">
           <span className="small text-muted">¿Ya tienes cuenta? </span>
-          <Link to="/login" className="small text-success fw-bold">Inicia sesión aquí</Link>
+          <Link className="small text-success fw-bold" to="/login">Inicia sesión aquí</Link>
         </div>
       </div>
     </div>

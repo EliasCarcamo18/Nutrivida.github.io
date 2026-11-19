@@ -1,55 +1,57 @@
 import { useState, useEffect } from 'react';
+import { obtenerUsuarios, actualizarRolUsuario, cambiarEstadoUsuario } from '../services/usuarios';
+import { UsuarioTabla } from '../components/UsuarioTabla';
 
 export const Admin = () => {
   const [usuarios, setUsuarios] = useState([]);
+  const [error, setError] = useState('');
+  const user = JSON.parse(localStorage.getItem('nutrivida_user') || 'null');
+
+  const cargarUsuarios = async () => {
+    try {
+      const data = await obtenerUsuarios(user?.token);
+      setUsuarios(data);
+      setError('');
+    } catch (err) {
+      setError(err.message);
+    }
+  };
 
   useEffect(() => {
-    // Intentar cargar usuarios del backend o respaldar con datos locales
-    fetch('http://localhost:3000/api/users')
-      .then((res) => {
-        if (!res.ok) throw new Error('Servidor no disponible');
-        return res.json();
-      })
-      .then((data) => setUsuarios(data))
-      .catch(() => {
-        // Datos de respaldo para que la app no muestre 'Failed to fetch'
-        setUsuarios([
-          { id: 1, nombre: 'María González', email: 'maria@ejemplo.com', rol: 'PACIENTE' },
-          { id: 2, nombre: 'Admin NutriVida', email: 'admin@nutrivida.cl', rol: 'ADMINISTRADOR' }
-        ]);
-      });
+    cargarUsuarios();
   }, []);
+
+  const handleCambiarRol = async (id, nuevoRol) => {
+    try {
+      const actualizado = await actualizarRolUsuario(id, nuevoRol, user?.token);
+      setUsuarios((prev) => prev.map((u) => (u.id === id ? actualizado : u)));
+    } catch (err) {
+      setError(err.message);
+    }
+  };
+
+  const handleCambiarEstado = async (id, activo) => {
+    try {
+      const actualizado = await cambiarEstadoUsuario(id, activo, user?.token);
+      setUsuarios((prev) => prev.map((u) => (u.id === id ? actualizado : u)));
+    } catch (err) {
+      setError(err.message);
+    }
+  };
 
   return (
     <div className="container py-4">
       <h2 className="text-success mb-2">Panel de Administración - Clínica NutriVida</h2>
-      <p className="text-muted mb-4">Gestión de usuarios y asignación de roles del sistema.</p>
+      <p className="text-muted mb-4">Gestión de usuarios, roles y permisos protegidos mediante JWT.</p>
 
-      <div className="table-responsive border rounded p-3 bg-light">
-        <table className="table table-hover align-middle mb-0">
-          <thead className="table-dark">
-            <tr>
-              <th>ID</th>
-              <th>Nombre</th>
-              <th>Correo Electrónico</th>
-              <th>Rol</th>
-            </tr>
-          </thead>
-          <tbody>
-            {usuarios.map((u) => (
-              <tr key={u.id}>
-                <td>{u.id}</td>
-                <td>{u.nombre}</td>
-                <td>{u.email}</td>
-                <td>
-                  <span className={`badge ${u.rol === 'ADMINISTRADOR' ? 'bg-danger' : 'bg-success'}`}>
-                    {u.rol}
-                  </span>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+      {error && <div className="alert alert-danger">{error}</div>}
+
+      <div className="border rounded p-3 bg-light">
+        <UsuarioTabla
+          usuarios={usuarios}
+          onCambiarRol={handleCambiarRol}
+          onCambiarEstado={handleCambiarEstado}
+        />
       </div>
     </div>
   );

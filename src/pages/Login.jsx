@@ -1,28 +1,34 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router';
+import { loginUsuario } from '../services/api';
 
 export const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errores, setErrores] = useState({});
+  const [errorServidor, setErrorServidor] = useState('');
+  const [cargando, setCargando] = useState(false);
   const navigate = useNavigate();
 
-  const handleLogin = (role, userEmail) => {
-    const sessionData = {
-      email: userEmail || email,
-      role: role,
-      nombre: role === 'ADMINISTRADOR' ? 'Administrador NutriVida' : 'Paciente NutriVida'
-    };
-    localStorage.setItem('nutrivida_user', JSON.stringify(sessionData));
-    
-    if (role === 'ADMINISTRADOR') {
-      navigate('/admin');
-    } else {
-      navigate('/reserva');
+  const autenticarYRedirigir = async (userEmail, userPass) => {
+    setCargando(true);
+    setErrorServidor('');
+    try {
+      const authData = await loginUsuario(userEmail, userPass);
+      localStorage.setItem('nutrivida_user', JSON.stringify(authData));
+      if (authData.role === 'ADMINISTRADOR') {
+        navigate('/admin');
+      } else {
+        navigate('/reserva');
+      }
+    } catch (err) {
+      setErrorServidor(err.message);
+    } finally {
+      setCargando(false);
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const nuevosErrores = {};
 
@@ -43,22 +49,23 @@ export const Login = () => {
     }
 
     setErrores({});
-    handleLogin('PACIENTE', email);
+    await autenticarYRedirigir(email, password);
   };
 
   return (
     <div className="container py-5 d-flex justify-content-center">
       <div className="card p-4 shadow-sm" style={{ maxWidth: '420px', width: '100%' }}>
         <h3 className="text-center text-success mb-3">Ingresar a NutriVida</h3>
-        
-        {/* noValidate desactiva los mensajes flotantes en ingles del navegador */}
+
+        {errorServidor && <div className="alert alert-danger py-2 small">{errorServidor}</div>}
+
         <form onSubmit={handleSubmit} noValidate>
           <div className="mb-3">
             <label className="form-label font-weight-bold">Correo Electrónico</label>
             <input
               type="email"
               className={`form-control ${errores.email ? 'is-invalid' : ''}`}
-              placeholder="Ejemplo: paciente@ejemplo.com"
+              placeholder="Ejemplo: paciente@nutrivida.cl"
               value={email}
               onChange={(e) => {
                 setEmail(e.target.value);
@@ -83,36 +90,38 @@ export const Login = () => {
             {errores.password && <div className="invalid-feedback d-block">{errores.password}</div>}
           </div>
 
-          <button type="submit" className="btn btn-success w-100 mb-3">
-            Iniciar Sesión
+          <button type="submit" className="btn btn-success w-100 mb-3" disabled={cargando}>
+            {cargando ? 'Validando credenciales...' : 'Iniciar Sesión'}
           </button>
         </form>
 
         <hr />
 
         <div className="text-center mb-3">
-          <p className="text-muted small mb-2">Acceso rápido para evaluación:</p>
+          <p className="text-muted small mb-2">Acceso rápido con JWT real para evaluación:</p>
           <div className="d-grid gap-2">
             <button
               type="button"
               className="btn btn-outline-primary btn-sm"
-              onClick={() => handleLogin('PACIENTE', 'paciente@nutrivida.cl')}
+              disabled={cargando}
+              onClick={() => autenticarYRedirigir('paciente@nutrivida.cl', 'Paciente1234!')}
             >
-              Ingresar como Paciente (Reserva)
+              Ingresar como Paciente (JWT)
             </button>
             <button
               type="button"
               className="btn btn-outline-dark btn-sm"
-              onClick={() => handleLogin('ADMINISTRADOR', 'admin@nutrivida.cl')}
+              disabled={cargando}
+              onClick={() => autenticarYRedirigir('admin@nutrivida.cl', 'Admin1234!')}
             >
-              Ingresar como Administrador (Panel Admin)
+              Ingresar como Administrador (JWT)
             </button>
           </div>
         </div>
 
         <div className="text-center mt-2">
           <span className="small text-muted">¿No tienes cuenta? </span>
-          <Link to="/registro" className="small text-success fw-bold">Regístrate aquí</Link>
+          <Link className="small text-success fw-bold" to="/registro">Regístrate aquí</Link>
         </div>
       </div>
     </div>

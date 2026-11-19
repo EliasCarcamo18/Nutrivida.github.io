@@ -1,4 +1,4 @@
-const API_URL = 'http://localhost:8081/api/v1/usuarios';
+const API_URL = '/api/v1/usuarios';
 
 export const obtenerUsuarios = async (token) => {
   const response = await fetch(API_URL, {
@@ -14,7 +14,7 @@ export const obtenerUsuarios = async (token) => {
 };
 
 export const actualizarRolUsuario = async (id, nuevoRol, token) => {
-  const response = await fetch(`${API_URL}/${id}/rol`, {
+  const response = await fetch(`/${id}/rol`, {
     method: 'PATCH',
     headers: {
       'Authorization': `Bearer ${token}`,
@@ -29,7 +29,7 @@ export const actualizarRolUsuario = async (id, nuevoRol, token) => {
 };
 
 export const cambiarEstadoUsuario = async (id, activo, token) => {
-  const response = await fetch(`${API_URL}/${id}/estado`, {
+  const response = await fetch(`/${id}/estado`, {
     method: 'PATCH',
     headers: {
       'Authorization': `Bearer ${token}`,

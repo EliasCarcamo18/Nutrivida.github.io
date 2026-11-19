@@ -3,8 +3,8 @@ import PropTypes from 'prop-types';
 export const UsuarioTabla = ({ usuarios, onCambiarRol, onCambiarEstado }) => {
   return (
     <div className="table-responsive">
-      <table className="table table-striped table-hover align-middle">
-        <thead>
+      <table className="table table-striped table-hover align-middle mb-0">
+        <thead className="table-dark">
           <tr>
             <th>Nombre</th>
             <th>Correo Electrónico</th>
@@ -24,7 +24,7 @@ export const UsuarioTabla = ({ usuarios, onCambiarRol, onCambiarEstado }) => {
                   value={u.rol}
                   onChange={(e) => onCambiarRol(u.id, e.target.value)}
                 >
-                  <option value="PACIANTE">PACIENTE</option>
+                  <option value="PACIENTE">PACIENTE</option>
                   <option value="NUTRICIONISTA">NUTRICIONISTA</option>
                   <option value="ADMINISTRADOR">ADMINISTRADOR</option>
                 </select>

@@ -1,5 +1,5 @@
-﻿import { useState } from 'react';
-import { crearCita } from '../services/api';
+import { useState, useEffect, useCallback } from 'react';
+import { crearCita, obtenerHorasOcupadas } from '../services/api';
 
 export const Reserva = () => {
   const especialistas = [
@@ -20,31 +20,60 @@ export const Reserva = () => {
     }
   ];
 
+  const [nombrePaciente, setNombrePaciente] = useState('');
+  const [email, setEmail] = useState('');
+  const [telefono, setTelefono] = useState('');
   const [especialistaSeleccionado, setEspecialistaSeleccionado] = useState(especialistas[0].id);
   const [fecha, setFecha] = useState('');
   const [hora, setHora] = useState('');
-  const [motivo, setMotivo] = useState('');
+  const [horasOcupadas, setHorasOcupadas] = useState([]);
   const [errores, setErrores] = useState({});
   const [exito, setExito] = useState(false);
   const [errorServidor, setErrorServidor] = useState('');
+  const [errorConexion, setErrorConexion] = useState('');
   const [enviando, setEnviando] = useState(false);
 
   const nutricionistaActual = especialistas.find(e => e.id === especialistaSeleccionado);
+
+  const cargarDisponibilidad = useCallback(async () => {
+    if (!fecha) {
+      setHorasOcupadas([]);
+      setErrorConexion('');
+      return;
+    }
+    try {
+      setErrorConexion('');
+      const ocupadas = await obtenerHorasOcupadas(nutricionistaActual.nombre, fecha);
+      const lista = Array.isArray(ocupadas) ? ocupadas : [];
+      setHorasOcupadas(lista);
+      setHora((horaActual) => (lista.includes(horaActual) ? '' : horaActual));
+    } catch (err) {
+      setErrorConexion(err.message || 'No hay conexión con la base de datos. Verifica el servidor.');
+    }
+  }, [nutricionistaActual.nombre, fecha]);
+
+  useEffect(() => {
+    cargarDisponibilidad();
+  }, [cargarDisponibilidad]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     const nuevosErrores = {};
 
+    if (!nombrePaciente.trim()) {
+      nuevosErrores.nombrePaciente = 'Por favor, ingresa tu nombre completo.';
+    }
+    if (!email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      nuevosErrores.email = 'Por favor, ingresa un correo electrónico válido.';
+    }
+    if (!telefono.trim()) {
+      nuevosErrores.telefono = 'Por favor, ingresa tu teléfono de contacto.';
+    }
     if (!fecha) {
       nuevosErrores.fecha = 'Por favor, selecciona la fecha de la cita.';
     }
-
-    if (!hora) {
+    if (!hora || horasOcupadas.includes(hora)) {
       nuevosErrores.hora = 'Por favor, elige una hora disponible de la lista.';
-    }
-
-    if (!motivo.trim()) {
-      nuevosErrores.motivo = 'Por favor, describe brevemente el motivo de tu consulta antes de agendar.';
     }
 
     if (Object.keys(nuevosErrores).length > 0) {
@@ -59,18 +88,22 @@ export const Reserva = () => {
 
     try {
       await crearCita({
-        especialista: nutricionistaActual.nombre,
-        fecha,
-        hora,
-        motivo: motivo.trim(),
+        nombrePaciente: nombrePaciente.trim(),
+        email: email.trim(),
+        telefono: telefono.trim(),
+        fechaCita: `${fecha} ${hora}`,
+        servicio: nutricionistaActual.nombre,
       });
       setExito(true);
-      setMotivo('');
-      setFecha('');
+      setHorasOcupadas((prev) => [...prev, hora]);
+      setNombrePaciente('');
+      setEmail('');
+      setTelefono('');
       setHora('');
-    } catch {
+    } catch (err) {
       setExito(false);
-      setErrorServidor('No se pudo conectar con el servidor para agendar la cita. Intenta nuevamente.');
+      setErrorServidor(err.message || 'No se pudo conectar con el servidor para agendar la cita.');
+      cargarDisponibilidad();
     } finally {
       setEnviando(false);
     }
@@ -86,6 +119,15 @@ export const Reserva = () => {
         </div>
       )}
 
+      {errorConexion && (
+        <div className="alert alert-warning d-flex justify-content-between align-items-center" role="alert">
+          <span>{errorConexion}</span>
+          <button type="button" className="btn btn-sm btn-outline-dark" onClick={cargarDisponibilidad}>
+            Reintentar
+          </button>
+        </div>
+      )}
+
       {errorServidor && (
         <div className="alert alert-danger" role="alert">
           {errorServidor}
@@ -95,7 +137,45 @@ export const Reserva = () => {
       <div className="card p-4 shadow-sm">
         <form onSubmit={handleSubmit} noValidate>
           <div className="mb-3">
-            <label className="form-label font-weight-bold">Seleccionar Nutricionista</label>
+            <label className="form-label font-weight-bold">Nombre Completo</label>
+            <input
+              type="text"
+              placeholder="Ej: Camila Rojas"
+              className={`form-control ${errores.nombrePaciente ? 'is-invalid' : ''}`}
+              value={nombrePaciente}
+              onChange={(e) => setNombrePaciente(e.target.value)}
+            />
+            {errores.nombrePaciente && <div className="invalid-feedback d-block">{errores.nombrePaciente}</div>}
+          </div>
+
+          <div className="row">
+            <div className="col-md-6 mb-3">
+              <label className="form-label font-weight-bold">Correo Electrónico</label>
+              <input
+                type="email"
+                placeholder="correo@ejemplo.cl"
+                className={`form-control ${errores.email ? 'is-invalid' : ''}`}
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
+              {errores.email && <div className="invalid-feedback d-block">{errores.email}</div>}
+            </div>
+
+            <div className="col-md-6 mb-3">
+              <label className="form-label font-weight-bold">Teléfono</label>
+              <input
+                type="tel"
+                placeholder="+56 9 1234 5678"
+                className={`form-control ${errores.telefono ? 'is-invalid' : ''}`}
+                value={telefono}
+                onChange={(e) => setTelefono(e.target.value)}
+              />
+              {errores.telefono && <div className="invalid-feedback d-block">{errores.telefono}</div>}
+            </div>
+          </div>
+
+          <div className="mb-3">
+            <label className="form-label font-weight-bold">Seleccionar Nutricionista y Servicio</label>
             <select
               className="form-select"
               value={especialistaSeleccionado}
@@ -131,25 +211,16 @@ export const Reserva = () => {
               onChange={(e) => setHora(e.target.value)}
             >
               <option value="">-- Selecciona una hora disponible --</option>
-              {nutricionistaActual.horarios.map((h, i) => (
-                <option key={i} value={h}>
-                  {h}
-                </option>
-              ))}
+              {nutricionistaActual.horarios.map((h, i) => {
+                const ocupada = horasOcupadas.includes(h);
+                return (
+                  <option key={i} value={h} disabled={ocupada}>
+                    {ocupada ? `${h} (No disponible)` : h}
+                  </option>
+                );
+              })}
             </select>
             {errores.hora && <div className="invalid-feedback d-block">{errores.hora}</div>}
-          </div>
-
-          <div className="mb-3">
-            <label className="form-label font-weight-bold">Motivo de la Consulta <span className="text-danger">*</span></label>
-            <textarea
-              className={`form-control ${errores.motivo ? 'is-invalid' : ''}`}
-              rows="3"
-              placeholder="Ejemplo: Evaluación nutricional deportiva, plan de alimentación para control de peso..."
-              value={motivo}
-              onChange={(e) => setMotivo(e.target.value)}
-            ></textarea>
-            {errores.motivo && <div className="invalid-feedback d-block">{errores.motivo}</div>}
           </div>
 
           <button type="submit" className="btn btn-success w-100" disabled={enviando}>
